@@ -10,7 +10,7 @@ function activate(context) {
         const tabNames = tabs.map(tab => tab.label);
         vscode.window.showQuickPick(tabNames);
     });
-
+    context.globalState.setKeysForSync(['tabGroups']);
     context.subscriptions.push(listTabs);
 
     let createGroup = vscode.commands.registerCommand('tabgroups.createGroup', async () => {

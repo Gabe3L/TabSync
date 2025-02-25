@@ -43,6 +43,7 @@
     "eslint": "^9.19.0"
   },
   "dependencies": {
+    "globals": "^13.24.0",
     "tabsync": "file:"
   }
 }
