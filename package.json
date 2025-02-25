@@ -1,0 +1,48 @@
+{
+  "name": "tabsync",
+  "displayName": "TabSync",
+  "description": "An extension to group and manage tabs in VS Code.",
+  "version": "0.0.1",
+  "publisher": "Gabe Lynch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Gabe3L/TabSync"
+  },
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "activationEvents": [],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tabgroups.createGroup",
+        "title": "TabSync: Create Group"
+      },
+      {
+        "command": "tabgroups.restoreGroup",
+        "title": "TabSync: Restore Group"
+      },
+      {
+        "command": "tabgroups.listTabs",
+        "title": "TabSync: List Tabs"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.97.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "eslint": "^9.19.0"
+  },
+  "dependencies": {
+    "tabsync": "file:"
+  }
+}
