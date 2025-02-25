@@ -16,17 +16,18 @@
   "contributes": {
     "commands": [
       {
-        "command": "tabgroups.createGroup",
+        "command": "tabsync.listTabs",
+        "title": "TabSync: List Tabs"
+      },
+      {
+        "command": "tabsync.createGroup",
         "title": "TabSync: Create Group"
       },
       {
-        "command": "tabgroups.restoreGroup",
+        "command": "tabsync.restoreGroup",
         "title": "TabSync: Restore Group"
       },
-      {
-        "command": "tabgroups.listTabs",
-        "title": "TabSync: List Tabs"
-      }
+      {}
     ]
   },
   "scripts": {

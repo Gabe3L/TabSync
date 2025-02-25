@@ -3,17 +3,16 @@ const vscode = require('vscode');
 let tabGroups = {};
 
 function activate(context) {
-    console.log('Tab Groups Extension is now active!');
+    console.log('TabSync is now active!');
 
-    let listTabs = vscode.commands.registerCommand('tabgroups.listTabs', () => {
+    let listTabs = vscode.commands.registerCommand('tabsync.listTabs', () => {
         const tabs = vscode.window.tabGroups.all.flatMap(group => group.tabs);
         const tabNames = tabs.map(tab => tab.label);
         vscode.window.showQuickPick(tabNames);
     });
-    context.globalState.setKeysForSync(['tabGroups']);
     context.subscriptions.push(listTabs);
 
-    let createGroup = vscode.commands.registerCommand('tabgroups.createGroup', async () => {
+    let createGroup = vscode.commands.registerCommand('tabsync.createGroup', async () => {
         const groupName = await vscode.window.showInputBox({ prompt: 'Enter a name for the new tab group' });
         if (!groupName) return;
 
@@ -26,7 +25,7 @@ function activate(context) {
 
     context.subscriptions.push(createGroup);
 
-    let restoreGroup = vscode.commands.registerCommand('tabgroups.restoreGroup', async () => {
+    let restoreGroup = vscode.commands.registerCommand('tabsync.restoreGroup', async () => {
         const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to restore' });
         if (!groupName) return;
 
@@ -38,7 +37,37 @@ function activate(context) {
 
     context.subscriptions.push(restoreGroup);
     
-    context.globalState.update('tabGroups', tabGroups);
+    let renameGroup = vscode.commands.registerCommand('tabsync.renameGroup', async () => {
+        const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to rename' });
+        if (!groupName) return;
+        
+        const newName = await vscode.window.showInputBox({ prompt: 'Enter a new name for the tab group', value: groupName });
+        if (!newName || newName === groupName) return;
+        
+        tabGroups[newName] = tabGroups[groupName];
+        delete tabGroups[groupName];
+        await context.globalState.update('tabGroups', tabGroups);
+        
+        vscode.window.showInformationMessage(`Tab group renamed to "${newName}".`);
+    });
+    
+    context.subscriptions.push(renameGroup);
+
+    let changeColour = vscode.commands.registerCommand('tabsync.changeColorur', async () => {
+        const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to change color' });
+        if (!groupName) return;
+
+        const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Gray', 'Default'];
+        const color = await vscode.window.showQuickPick(colors, { placeHolder: 'Select a color' });
+        if (!color) return;
+
+        tabGroups[groupName].color = color.toLowerCase();
+        await context.globalState.update('tabGroups', tabGroups);
+        
+        vscode.window.showInformationMessage(`Tab group "${groupName}" color changed to ${color}.`);
+    });
+    
+    context.subscriptions.push(changeColour);
 }
 
 function deactivate() {
