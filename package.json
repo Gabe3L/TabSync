@@ -24,6 +24,14 @@
         "title": "TabSync: Create Group"
       },
       {
+        "command": "tabsync.addFileToGroup",
+        "title": "TabSync: Add File to Group"
+      },
+      {
+        "command": "tabsync.removeFileFromGroup",
+        "title": "TabSync: Remove File from Group"
+      },
+      {
         "command": "tabsync.restoreGroup",
         "title": "TabSync: Restore Group"
       },

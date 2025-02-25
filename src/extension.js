@@ -5,7 +5,15 @@ let tabGroups = {};
 function activate(context) {
     console.log('TabSync is now active!');
 
-    tabGroups = context.globalState.get('tabGroups', {});
+    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.toString() : null;
+    const lastWorkspace = context.globalState.get('lastWorkspace', null);
+    if (workspaceFolder !== lastWorkspace) {
+        tabGroups = {};
+        context.globalState.update('tabGroups', tabGroups);
+        context.globalState.update('lastWorkspace', workspaceFolder);
+    } else {
+        tabGroups = context.globalState.get('tabGroups', {});
+    }
 
     let listTabs = vscode.commands.registerCommand('tabsync.listTabs', () => {
         const tabs = vscode.window.tabGroups.all.flatMap(group => group.tabs);
@@ -28,6 +36,40 @@ function activate(context) {
     });
 
     context.subscriptions.push(createGroup);
+
+    let addFileToGroup = vscode.commands.registerCommand('tabsync.addFileToGroup', async () => {
+        const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to add a file to' });
+        if (!groupName) return;
+
+        const activeEditor = vscode.window.activeTextEditor;
+        if (!activeEditor) {
+            vscode.window.showErrorMessage('No active file to add.');
+            return;
+        }
+
+        const fileUri = activeEditor.document.uri.toString();
+        if (!tabGroups[groupName].files.includes(fileUri)) {
+            tabGroups[groupName].files.push(fileUri);
+            await context.globalState.update('tabGroups', tabGroups);
+            vscode.window.showInformationMessage(`File added to "${groupName}".`);
+        } else {
+            vscode.window.showWarningMessage('File already in group.');
+        }
+    });
+    context.subscriptions.push(addFileToGroup);
+
+    let removeFileFromGroup = vscode.commands.registerCommand('tabsync.removeFileFromGroup', async () => {
+        const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to remove a file from' });
+        if (!groupName) return;
+
+        const fileUri = await vscode.window.showQuickPick(tabGroups[groupName].files, { placeHolder: 'Select a file to remove' });
+        if (!fileUri) return;
+
+        tabGroups[groupName].files = tabGroups[groupName].files.filter(uri => uri !== fileUri);
+        await context.globalState.update('tabGroups', tabGroups);
+        vscode.window.showInformationMessage('File removed from group.');
+    });
+    context.subscriptions.push(removeFileFromGroup);
 
     let restoreGroup = vscode.commands.registerCommand('tabsync.restoreGroup', async () => {
         const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to restore' });
