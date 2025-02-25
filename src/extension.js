@@ -5,6 +5,8 @@ let tabGroups = {};
 function activate(context) {
     console.log('TabSync is now active!');
 
+    tabGroups = context.globalState.get('tabGroups', {});
+
     let listTabs = vscode.commands.registerCommand('tabsync.listTabs', () => {
         const tabs = vscode.window.tabGroups.all.flatMap(group => group.tabs);
         const tabNames = tabs.map(tab => tab.label);
@@ -19,7 +21,9 @@ function activate(context) {
         const activeTabs = vscode.window.tabGroups.all.flatMap(group => group.tabs);
         const fileUris = activeTabs.map(tab => tab.input instanceof vscode.TabInputText ? tab.input.uri.toString() : '');
 
-        tabGroups[groupName] = fileUris;
+        tabGroups[groupName] = { files: fileUris, color: 'default' };
+        await context.globalState.update('tabGroups', tabGroups);
+
         vscode.window.showInformationMessage(`Tab group "${groupName}" saved!`);
     });
 
@@ -29,7 +33,7 @@ function activate(context) {
         const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to restore' });
         if (!groupName) return;
 
-        const fileUris = tabGroups[groupName];
+        const fileUris = tabGroups[groupName].files;
         for (const uri of fileUris) {
             await vscode.window.showTextDocument(vscode.Uri.parse(uri), { preview: false });
         }
@@ -53,7 +57,7 @@ function activate(context) {
     
     context.subscriptions.push(renameGroup);
 
-    let changeColour = vscode.commands.registerCommand('tabsync.changeColorur', async () => {
+    let changeColour = vscode.commands.registerCommand('tabsync.changeColour', async () => {
         const groupName = await vscode.window.showQuickPick(Object.keys(tabGroups), { placeHolder: 'Select a tab group to change color' });
         if (!groupName) return;
 
