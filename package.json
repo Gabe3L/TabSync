@@ -27,7 +27,14 @@
         "command": "tabsync.restoreGroup",
         "title": "TabSync: Restore Group"
       },
-      {}
+      {
+        "command": "tabsync.renameGroup",
+        "title": "TabSync: Rename Group"
+      },
+      {
+        "command": "tabsync.changeColour",
+        "title": "TabSync: Change Colour"
+      }
     ]
   },
   "scripts": {
